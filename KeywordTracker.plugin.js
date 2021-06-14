@@ -1,11 +1,11 @@
 /**
  * @name KeywordTracker
  * @invite 0Tmfo5ZbORCRqbAd
- * @authorLink https://github.com/sarahkittyy/KeywordTracker/blob/main/KeywordTracker.plugin.js
+ * @authorLink https://github.com/sarahkittyy
  * @donate https://paypal.me/sarahkittyy
  * @website https://github.com/sarahkittyy/KeywordTracker
- * @source https://github.com/sarahkittyy/KeywordTracker
- * @updateURL https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
+ * @source https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
+ * @updateUrl https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
  */
 /*@cc_on
 @if (@_jscript)
@@ -32,7 +32,7 @@
 @else@*/
 
 module.exports = (() => {
-    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.0.1","description":"Watch for certain phrases in specified channels, and ping if one is found.","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://github.com/sarahkittyy/KeywordTracker","authorLink":"https://github.com/sarahkittyy/KeywordTracker/blob/main/KeywordTracker.plugin.js","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"Release","items":["Initial release."]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]}],"main":"index.js"};
+    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.0.2","description":"Watch for certain phrases in specified channels, and ping if one is found.","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"Release","items":["Initial release."]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]}],"main":"index.js"};
 
     return !global.ZeresPluginLibrary ? class {
         constructor() {this._config = config;}
@@ -151,6 +151,8 @@ module.exports = (() => {
         if (message.author.id === this.userId) return;
         if (!message.content) return;
 
+        // no dms!
+        if (!channel.guild_id) return;
         // ensure that the channel this is from is enabled
         if (!this.settings.guilds[channel.guild_id].channels[channel.id]) return;
         
