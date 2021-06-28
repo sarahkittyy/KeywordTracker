@@ -175,7 +175,7 @@ module.exports = (() => {
           return true;
         });
       } catch (e) {
-        console.error(e);
+        Logger.error(`${e}`);
       }
     }
 
