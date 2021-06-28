@@ -180,7 +180,6 @@ module.exports = (() => {
     }
 
     pingSuccess(message, channel, match) {
-      console.log(message.author);
       Logger.info('Match found!');
       Modules.NotificationModule.showNotification(
         `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.webp?size=256`, // icon
@@ -294,19 +293,19 @@ module.exports = (() => {
         // add group to settings if it does not exist
         if (this.settings.guilds[g.id] == null) {
           this.settings.guilds[g.id] = {
-            // set all channels to disabled by default
+            // set all channels to enabled by default
             channels: g.channels
               .filter(c => c.type === 'GUILD_TEXT')
               .reduce((obj, c) => {
-                obj[c.id] = false;
+                obj[c.id] = true;
                 return obj;
               }, {}),
-            enabled: false,
+            enabled: true,
           };
         }
         // add switch next to guild to toggle all channels
         if (this.settings.guilds[g.id].enabled == null) {
-          this.settings.guilds[g.id].enabled = false;
+          this.settings.guilds[g.id].enabled = true;
         }
         var guildSwitch = this.makeSwitch(this.settings.guilds[g.id].enabled, (v) => {
           this.settings.guilds[g.id].enabled = v;
@@ -334,7 +333,7 @@ module.exports = (() => {
               let status = this.settings.guilds[g.id].channels[c.id];
               if (status == null) {
                 Logger.warn(`channel ${c.id} of guild ${g.id} doesn't exist. creating it.`);
-                this.settings.guilds[g.id].channels[c.id] = false;
+                this.settings.guilds[g.id].channels[c.id] = true;
               }
               let channelSwitch = this.makeSwitch(status, (v) => {
                 this.settings.guilds[g.id].channels[c.id] = v;
