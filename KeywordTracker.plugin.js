@@ -5,6 +5,7 @@
  * @donate https://paypal.me/sarahkittyy
  * @website https://github.com/sarahkittyy/KeywordTracker
  * @source https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
+ * @version 1.0.6
  * @updateUrl https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
  */
 /*@cc_on
@@ -32,7 +33,7 @@
 @else@*/
 
 module.exports = (() => {
-    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.0.5","description":"Watch for certain phrases in specified channels, and ping if one is found.","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"Release","items":["Initial release."]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]}],"main":"index.js"};
+    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.0.6","description":"Watch for certain phrases in specified channels, and ping if one is found.","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"Release","items":["Initial release."]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]}],"main":"index.js"};
 
     return !global.ZeresPluginLibrary ? class {
         constructor() {this._config = config;}
