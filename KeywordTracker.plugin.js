@@ -96,6 +96,7 @@ module.exports = (() => {
 }
 `;
   const defaultSettings = {
+    userIds: [],
     keywords: [],
     guilds: {},
   };
@@ -175,7 +176,15 @@ module.exports = (() => {
         
         // ensure that the channel this is from is enabled
         if (!this.settings.guilds[channel.guild_id].channels[channel.id]) return;
-        
+
+        this.settings.userIds.every((userId) => {
+          if (message.author.id === userId) {
+            this.pingSuccess(message, channel, userId);
+            return false; // stop searching
+          }
+          return true;
+        })
+
         // run through every single keyword as a regex
         this.settings.keywords.every((kw) => {
           let rx;
