@@ -1,5 +1,17 @@
 # KeywordTracker
 
-Matches received messages against a configurable series of phrases, and pings if one matches.
+Allows you to set keywords, and servers to watch, so that you get notifications whenever someone says that word :)
 
 Built off [zlib](https://github.com/rauenzi/BDPluginLibrary).
+
+## Screenshots
+
+### Keyword Panel
+
+![](KeywordPanel.png)
+
+### Channel Panel
+
+![](ChannelPanel.png)
+
+### Notification
