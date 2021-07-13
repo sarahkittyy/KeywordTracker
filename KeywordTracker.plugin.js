@@ -184,6 +184,7 @@ module.exports = (() => {
 
         this.settings.userIds.every((userId) => {
           if (message.author.id === userId) {
+            const guild = guilds.find(g => g.id === channel.guild_id);
             this.pingSuccess(message, channel, guild.name, userId);
             return false; // stop searching
           }
