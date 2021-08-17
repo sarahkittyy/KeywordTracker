@@ -96,7 +96,7 @@ module.exports = (() => {
 }
 `;
   const defaultSettings = {
-    userIds: [],
+    whitelistedUsers: [],
     keywords: [],
     ignoredUsers: [],
     guilds: {},
@@ -178,11 +178,11 @@ module.exports = (() => {
           };
           this.saveSettings();
         }
-        
+
         // ensure that the channel this is from is enabled
         if (!this.settings.guilds[channel.guild_id].channels[channel.id]) return;
 
-        this.settings.userIds.every((userId) => {
+        this.settings.whitelistedUsers.every((userId) => {
           if (message.author.id === userId) {
             const guild = guilds.find(g => g.id === channel.guild_id);
             this.pingSuccess(message, channel, guild.name, userId);
@@ -437,25 +437,43 @@ module.exports = (() => {
       });
       let notificationToggle = new SettingField('', 'Enable notification sounds', null, notificationSwitch, { noteOnTop: true });
       other.append(notificationToggle);
-      
-      let useridstip = new SettingField('', 'Ignore users here. One user ID per line. (Right click name -> Copy ID). Be sure developer options are on.', null, document.createElement('div'));
-      other.append(useridstip);
-      
+
+      let ignoreuseridstip = new SettingField('', 'Ignore users here. One user ID per line. (Right click name -> Copy ID). Be sure developer options are on.', null, document.createElement('div'));
+      other.append(ignoreuseridstip);
+
       // add keyword textbox
-      let userids = document.createElement('textarea');
-      userids.value = this.settings.ignoredUsers.join('\n');
-      userids.addEventListener('change', () => {
-        this.settings.ignoredUsers = userids.value.split('\n');
+      let ignoreuserids = document.createElement('textarea');
+      ignoreuserids.value = this.settings.ignoredUsers.join('\n');
+      ignoreuserids.addEventListener('change', () => {
+        this.settings.ignoredUsers = ignoreuserids.value.split('\n');
         this.saveSettings();
       });
-      userids.setAttribute('rows', '8');
-      userids.style.width = '95%';
-      userids.style.resize = 'none';
-      userids.style['margin-left'] = '2.5%';
-      userids.style.borderRadius = '3px';
-      userids.style.border = '2px solid grey';
-      userids.style.backgroundColor = '#ddd';
-      other.append(userids);
+      ignoreuserids.setAttribute('rows', '8');
+      ignoreuserids.style.width = '95%';
+      ignoreuserids.style.resize = 'none';
+      ignoreuserids.style['margin-left'] = '2.5%';
+      ignoreuserids.style.borderRadius = '3px';
+      ignoreuserids.style.border = '2px solid grey';
+      ignoreuserids.style.backgroundColor = '#ddd';
+      other.append(ignoreuserids);
+
+      let whitelistuseridstip = new SettingField('', 'Whitelist users here (all their messages will trigger notifications). One user ID per line. (Right click name -> Copy ID). Be sure developer options are on.', null, document.createElement('div'));
+      other.append(whitelistuseridstip);
+
+      let whitelistuserids = document.createElement('textarea');
+      whitelistuserids.value = this.settings.whitelistedUsers.join('\n');
+      whitelistuserids.addEventListener('change', () => {
+        this.settings.whitelistedUsers = whitelistuserids.value.split('\n');
+        this.saveSettings();
+      });
+      whitelistuserids.setAttribute('rows', '8');
+      whitelistuserids.style.width = '95%';
+      whitelistuserids.style.resize = 'none';
+      whitelistuserids.style['margin-left'] = '2.5%';
+      whitelistuserids.style.borderRadius = '3px';
+      whitelistuserids.style.border = '2px solid grey';
+      whitelistuserids.style.backgroundColor = '#ddd';
+      other.append(whitelistuserids);
 
       this.saveSettings();
       return panel;
