@@ -15,3 +15,11 @@ Built off [zlib](https://github.com/rauenzi/BDPluginLibrary).
 ![](ChannelPanel.png)
 
 ### Notification
+
+#### Text Notification
+
+![](TextNotification.png)
+
+#### User Notification
+
+![](UserNotification.png)
