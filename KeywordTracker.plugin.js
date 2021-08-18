@@ -5,7 +5,7 @@
  * @donate https://paypal.me/sarahkittyy
  * @website https://github.com/sarahkittyy/KeywordTracker
  * @source https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
- * @version 1.1.0
+ * @version 1.1.1
  * @updateUrl https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
  */
 /*@cc_on
@@ -33,7 +33,7 @@
 @else@*/
 
 module.exports = (() => {
-    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.1.0","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"Release","items":["Initial release."]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]}],"main":"index.js"};
+    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.1.1","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"Release","items":["Initial release."]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added server name in notification","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]},{"title":"v1.1.1","items":["Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)","Updated README.md"]}],"main":"index.js"};
 
     return !global.ZeresPluginLibrary ? class {
         constructor() {this._config = config;}
@@ -182,14 +182,19 @@ module.exports = (() => {
         // ensure that the channel this is from is enabled
         if (!this.settings.guilds[channel.guild_id].channels[channel.id]) return;
 
-        this.settings.whitelistedUsers.every((userId) => {
+        let whitelistedUserFound = !this.settings.whitelistedUsers.every((userId) => {
           if (message.author.id === userId) {
             const guild = guilds.find(g => g.id === channel.guild_id);
-            this.pingSuccess(message, channel, guild.name, userId);
+            this.pingWhitelistMatch(message, channel, guild.name);
             return false; // stop searching
           }
           return true;
-        })
+        });
+
+        // do not bother scanning keywords if the user themself was matched
+        if (whitelistedUserFound) {
+          return;
+        }
 
         // run through every single keyword as a regex
         this.settings.keywords.every((kw) => {
@@ -215,22 +220,44 @@ module.exports = (() => {
       }
     }
 
-    pingSuccess(message, channel, guild, match) {
-      Logger.info('Match found!');
+    sendMatchNotification(thumbnail, title, text, redirect) {
       Modules.NotificationModule.showNotification(
-        `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.webp?size=256`, // icon
-        `Keyword match in ${guild}!`, // title
-        `${message.author.username} matched ${match} in #${channel.name}.`,
+        thumbnail,
+        title,
+        text,
         // opts
         {
           onClick: () => {
             Modules.NavigationUtils.transitionTo(
-              `/channels/${message.guild_id}/${channel.id}/${message.id}`,
+              redirect,
               undefined,
               undefined,
             );
           }
         }
+      );
+    }
+
+    pingWhitelistMatch(message, channel, guild) {
+      Logger.info('Match found!');
+      this.sendMatchNotification(
+        `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.webp?size=256`,
+        `User match in ${guild}!`,
+        `${message.author.username} typed in #${channel.name}.`,
+        `/channels/${message.guild_id}/${channel.id}/${message.id}`
+      );
+      if (this.settings.notifications) {
+        Modules.SoundModule.playSound("message1", 0.4);
+      }
+    }
+
+    pingSuccess(message, channel, guild, match) {
+      Logger.info('Match found!');
+      this.sendMatchNotification(
+        `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.webp?size=256`,
+        `Keyword match in ${guild}!`,
+        `${message.author.username} matched ${match} in #${channel.name}.`,
+        `/channels/${message.guild_id}/${channel.id}/${message.id}`
       );
       if (this.settings.notifications) {
         Modules.SoundModule.playSound("message1", 0.4);
