@@ -28,4 +28,6 @@ Please submit your pull requests [here](https://github.com/sarahkittyy/KeywordTr
 
 ![](UserNotification.png)
 
+### Inbox
 
+![](Inbox.png)
