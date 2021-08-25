@@ -5,7 +5,7 @@
  * @donate https://paypal.me/sarahkittyy
  * @website https://github.com/sarahkittyy/KeywordTracker
  * @source https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
- * @version 1.2.2
+ * @version 1.2.3
  * @updateUrl https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
  */
 /*@cc_on
@@ -33,7 +33,7 @@
 @else@*/
 
 module.exports = (() => {
-    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.2.2","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"Release","items":["Initial release."]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added server name in notification","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]},{"title":"v1.1.1","items":["Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)","Updated README.md"]},{"title":"v1.2.0","items":["Finally added an inbox, oh my god, why didn't I do this sooner.","You can find all recent missed matches from the last 60 days right next to the pinned messages button."]},{"title":"v1.2.1","items":["Hopefully fixes the issue of the keyword inbox button not appearing on some clients."]},{"title":"v1.2.2","items":["Actually, for realsies, fixes the issue (Thanks Meduxa)"]}],"main":"index.js"};
+    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.2.3","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"Release","items":["Initial release."]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added server name in notification","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]},{"title":"v1.1.1","items":["Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)","Updated README.md"]},{"title":"v1.2.0","items":["Finally added an inbox, oh my god, why didn't I do this sooner.","You can find all recent missed matches from the last 60 days right next to the pinned messages button."]},{"title":"v1.2.1","items":["Hopefully fixes the issue of the keyword inbox button not appearing on some clients."]},{"title":"v1.2.2","items":["Actually, for realsies, fixes the issue (Thanks Meduxa)"]},{"title":"v1.2.3","items":["Fixed crashing issue related to jumping to a matched keyword."]}],"main":"index.js"};
 
     return !global.ZeresPluginLibrary ? class {
         constructor() {this._config = config;}
@@ -385,6 +385,8 @@ module.exports = (() => {
       }
       console.log(pinned);
 
+      const ModalCloseEvent = new Event('modalclose');
+
       let inbox = pinned.cloneNode(true);
       inbox.setAttribute('is-keyword-tracker-inbox', true);
       inbox.setAttribute('aria-label', 'Keyword Matches');
@@ -400,7 +402,7 @@ module.exports = (() => {
 
       // actual modal window on-click
       const openModal = () => {
-        Modals.showModal('Keyword Matches', this.renderInbox(), {
+        let modalKey = Modals.showModal('Keyword Matches', this.renderInbox(() => { Modules.ModalActions.closeModal(modalKey); }), {
           confirmText: 'Close',
           cancelText: 'Mark as Read',
           onCancel: () => {
@@ -411,6 +413,11 @@ module.exports = (() => {
             this.saveSettings();
           }
         });
+        const closeModal = () => {
+          Modules.ModalActions.closeModal(modalKey);
+        };
+        inbox.removeEventListener('modalclose', closeModal);
+        inbox.addEventListener('modalclose', closeModal);
       };
       inbox.removeEventListener('click', openModal);
       inbox.addEventListener('click', openModal);
@@ -419,7 +426,7 @@ module.exports = (() => {
     }
 
     // render all messages from settings.unreadMatches
-    renderInbox() {
+    renderInbox(closeModal) {
       let root = document.createElement('div');
       root.className = 'kt-inbox-container';
 
@@ -481,13 +488,7 @@ module.exports = (() => {
           jump.addEventListener('click', () => {
             delete this.settings.unreadMatches[msg.id];
             this.saveSettings();
-            let modal = document.querySelector('div[class*="layerContainer"] > div[class*="backdrop"][class*="withLayer"]');
-            if(modal) {
-              let parent = modal.parentNode;
-              while (parent.hasChildNodes()) {
-                  parent.removeChild(parent.lastChild);
-              }
-            }
+            closeModal();
             Modules.NavigationUtils.transitionTo(
               `/channels/${msg.guild_id}/${msg.channel_id}/${msg.id}`,
               undefined,
