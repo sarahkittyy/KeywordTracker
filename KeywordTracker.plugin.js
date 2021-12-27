@@ -5,7 +5,7 @@
  * @donate https://paypal.me/sarahkittyy
  * @website https://github.com/sarahkittyy/KeywordTracker
  * @source https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
- * @version 1.2.4
+ * @version 1.2.5
  * @updateUrl https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
  */
 /*@cc_on
@@ -33,7 +33,7 @@
 @else@*/
 
 module.exports = (() => {
-    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.2.4","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"v1.2.4","items":["Fixed order of changelog.","Fixed the entire plugin, lol :)"]},{"title":"v1.2.3","items":["Fixed crashing issue related to jumping to a matched keyword."]},{"title":"v1.2.2","items":["Actually, for realsies, fixes the issue (Thanks Meduxa)"]},{"title":"v1.2.1","items":["Hopefully fixes the issue of the keyword inbox button not appearing on some clients."]},{"title":"v1.2.0","items":["Finally added an inbox, oh my god, why didn't I do this sooner.","You can find all recent missed matches from the last 60 days right next to the pinned messages button."]},{"title":"v1.1.1","items":["Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)","Updated README.md"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added server name in notification","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"Release","items":["Initial release."]}],"main":"index.js"};
+    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.2.5","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"v1.2.5","items":["Fixed memory leak in inbox panel."]},{"title":"v1.2.4","items":["Fixed order of changelog.","Fixed the entire plugin, lol :)"]},{"title":"v1.2.3","items":["Fixed crashing issue related to jumping to a matched keyword."]},{"title":"v1.2.2","items":["Actually, for realsies, fixes the issue (Thanks Meduxa)"]},{"title":"v1.2.1","items":["Hopefully fixes the issue of the keyword inbox button not appearing on some clients."]},{"title":"v1.2.0","items":["Finally added an inbox, oh my god, why didn't I do this sooner.","You can find all recent missed matches from the last 60 days right next to the pinned messages button."]},{"title":"v1.1.1","items":["Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)","Updated README.md"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added server name in notification","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"Release","items":["Initial release."]}],"main":"index.js"};
 
     return !global.ZeresPluginLibrary ? class {
         constructor() {this._config = config;}
@@ -197,9 +197,10 @@ module.exports = (() => {
       BdApi.Patcher.after(this.getName(), dispatchModule, 'dispatch', this.handleMessage.bind(this));
 
       const TitleBar = BdApi.findModuleByProps('Title', 'default', 'Caret');
+      this.inboxPanel = this.buildInboxPanel();
       BdApi.Patcher.before(this.getName(), TitleBar, "default", (_, [props], ret) => {
         if (props.toolbar.type === 'function') return;
-        props.toolbar.props.children[0].splice(Math.max(3, props.toolbar.props.children[0].length - 1), 0, this.buildInboxPanel());
+        props.toolbar.props.children[0].splice(Math.max(3, props.toolbar.props.children[0].length - 1), 0, this.inboxPanel);
       });
 
       this.userId = BdApi.findModuleByProps('getId').getId();
@@ -379,11 +380,9 @@ module.exports = (() => {
     // build the inbox panel placed directly after the pinned messages button
     buildInboxPanel() {
       let pinned = document.querySelector('div[aria-label*="Pinned Messages" i]');
-      Logger.info(pinned);
       if (!pinned) {
         return;
       }
-      console.log(pinned);
 
       const ModalCloseEvent = new Event('modalclose');
 
