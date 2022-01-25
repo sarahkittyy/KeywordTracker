@@ -5,7 +5,7 @@
  * @donate https://paypal.me/sarahkittyy
  * @website https://github.com/sarahkittyy/KeywordTracker
  * @source https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
- * @version 1.2.6
+ * @version 1.3.0
  * @updateUrl https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
  */
 /*@cc_on
@@ -33,7 +33,7 @@
 @else@*/
 
 module.exports = (() => {
-    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.2.6","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"v1.2.6","items":["Fixed inbox panel not showing up."]},{"title":"v1.2.5","items":["Fixed memory leak in inbox panel."]},{"title":"v1.2.4","items":["Fixed order of changelog.","Fixed the entire plugin, lol :)"]},{"title":"v1.2.3","items":["Fixed crashing issue related to jumping to a matched keyword."]},{"title":"v1.2.2","items":["Actually, for realsies, fixes the issue (Thanks Meduxa)"]},{"title":"v1.2.1","items":["Hopefully fixes the issue of the keyword inbox button not appearing on some clients."]},{"title":"v1.2.0","items":["Finally added an inbox, oh my god, why didn't I do this sooner.","You can find all recent missed matches from the last 60 days right next to the pinned messages button."]},{"title":"v1.1.1","items":["Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)","Updated README.md"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added server name in notification","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"Release","items":["Initial release."]}],"main":"index.js"};
+    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.3.0","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"v1.3.0","items":["Fixed issues caused by ZLib's update.","Added toggle to let your own messages trigger notifications. Good for testing :)","Inbox should now show up on languages that are not english."]},{"title":"v1.2.6","items":["Fixed inbox panel not showing up."]},{"title":"v1.2.5","items":["Fixed memory leak in inbox panel."]},{"title":"v1.2.4","items":["Fixed order of changelog.","Fixed the entire plugin, lol :)"]},{"title":"v1.2.3","items":["Fixed crashing issue related to jumping to a matched keyword."]},{"title":"v1.2.2","items":["Actually, for realsies, fixes the issue (Thanks Meduxa)"]},{"title":"v1.2.1","items":["Hopefully fixes the issue of the keyword inbox button not appearing on some clients."]},{"title":"v1.2.0","items":["Finally added an inbox, oh my god, why didn't I do this sooner.","You can find all recent missed matches from the last 60 days right next to the pinned messages button."]},{"title":"v1.1.1","items":["Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)","Updated README.md"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added server name in notification","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"Release","items":["Initial release."]}],"main":"index.js"};
 
     return !global.ZeresPluginLibrary ? class {
         constructor() {this._config = config;}
@@ -166,9 +166,9 @@ module.exports = (() => {
     enabled: true,
     unreadMatches: {},
     notifications: true,
+    allowSelf: false,
   };
   const {
-    DiscordAPI,
     DOMTools,
     Patcher,
     Logger,
@@ -219,7 +219,7 @@ module.exports = (() => {
 
     handleMessage(_, args) {
       try {
-        const { guilds } = DiscordAPI;
+        const guilds = Object.values(Modules.GuildStore.getGuilds());
         let event = args[0];
         if (event.type !== 'MESSAGE_CREATE') return;
         // get message data
@@ -231,13 +231,15 @@ module.exports = (() => {
           message = Modules.MessageStore.getMessage(channel.id, message.id);
           if (!message || !message.author) return;
         }
-        if (message.author.id === this.userId) return;
+        if (this.settings.allowSelf === false && message.author.id === this.userId) return;
         // ignore ignored users
         if (this.settings.ignoredUsers.includes(message.author.id)) return;
         if (!message.content) return;
 
         // no dms!
         if (!channel.guild_id) return;
+
+        Logger.info('nya!');
 
         // add guild to settings if it does not exist
         if (this.settings.guilds[channel.guild_id] == null) {
@@ -262,7 +264,7 @@ module.exports = (() => {
         let whitelistedUserFound = !this.settings.whitelistedUsers.every((userId) => {
           if (message.author.id === userId) {
             const guild = guilds.find(g => g.id === channel.guild_id);
-            this.pingWhitelistMatch(message, channel, guild.name);
+            this.pingWhitelistMatc861302597503418399h(message, channel, guild.name);
             return false; // stop searching
           }
           return true;
@@ -383,7 +385,7 @@ module.exports = (() => {
 
     // build the inbox panel placed directly after the pinned messages button
     buildInboxPanel() {
-      let pinned = document.querySelector('div[aria-label*="Pinned Messages" i]');
+      let pinned = document.querySelector('div[class*="toolbar-3" i] > div:first-child');
       if (!pinned) {
         return;
       }
@@ -525,15 +527,17 @@ module.exports = (() => {
     //TODO: god why
     buildSettings() {
       const { Textbox, SettingPanel, SettingGroup, Keybind, SettingField, /*Switch*/ } = Settings;
-      const { sortedGuilds, guilds: normGuilds } = DiscordAPI;
+      const guilds = Modules.SortedGuildStore.getSortedGuilds()
+                      .reduce((acc, v) => {
+                        return acc.concat(v.guilds);
+                      }, [])
+                      .map(g => {
+                        g.channels = Modules.GuildChannelsStore.getChannels(g.id).SELECTABLE.map(c => c.channel);
+                        Logger.info(g.channels);
+                        return g;
+                      });
       const { parseHTML } = DOMTools;
 
-      // sorted guilds doesn't have critical data, and the normal guild list isn't sorted.
-      const guilds = sortedGuilds.reduce((arr, gobj) => {
-        return arr.concat(gobj.discordObject.guilds.map(g => {
-          return normGuilds.find(v => v.id === g.id);
-        }));
-      }, []);
       // when the main guild switch is hit this event is fired, causing all channel switches to sync
       const GuildFlushEvent = new Event('guildflushevent');
 
@@ -609,7 +613,6 @@ module.exports = (() => {
           this.settings.guilds[g.id] = {
             // set all channels to enabled by default
             channels: g.channels
-              .filter(c => c.type === 'GUILD_TEXT')
               .reduce((obj, c) => {
                 obj[c.id] = true;
                 return obj;
@@ -644,7 +647,6 @@ module.exports = (() => {
         let channelLoader = () => {
           // for every channel...
           g.channels
-            .filter(c => c.type === 'GUILD_TEXT')
             .forEach((c, i) => {
               // ...add a switch
               let status = this.settings.guilds[g.id].channels[c.id];
@@ -689,8 +691,17 @@ module.exports = (() => {
         this.settings.notifications = v;
         this.saveSettings();
       });
+
+      let selfPingSwitch = this.makeSwitch(this.settings.allowSelf, (v) => {
+        this.settings.allowSelf = v;
+        this.saveSettings();
+      });
+
       let notificationToggle = new SettingField('', 'Enable notification sounds', null, notificationSwitch, { noteOnTop: true });
       other.append(notificationToggle);
+
+      let selfPingToggle = new SettingField('', 'Enable own messages to trigger notifications.', null, selfPingSwitch, { noteOnTop: true });
+      other.append(selfPingToggle);
 
       let ignoreuseridstip = new SettingField('', 'Ignore users here. One user ID per line. (Right click name -> Copy ID). Be sure developer options are on.', null, document.createElement('div'));
       other.append(ignoreuseridstip);
