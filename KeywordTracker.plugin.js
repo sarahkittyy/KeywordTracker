@@ -167,6 +167,7 @@ module.exports = (() => {
     unreadMatches: {},
     notifications: true,
     allowSelf: false,
+    allowWebhook: true,
   };
   const {
     DOMTools,
@@ -234,6 +235,11 @@ module.exports = (() => {
         if (this.settings.allowSelf === false && message.author.id === this.userId) return;
         // ignore ignored users
         if (this.settings.ignoredUsers.includes(message.author.id)) return;
+
+
+        // no webhooks
+        if (this.settings.allowWebhook && message.webhookId) return;
+
         if (!message.content) return;
 
         // no dms!
@@ -697,11 +703,21 @@ module.exports = (() => {
         this.saveSettings();
       });
 
+
+      
+      let allowWebhookSwitch = this.makeSwitch(this.settings.allowWebhook, (v) => {
+        this.settings.allowWebhook = v;
+        this.saveSettings();
+      });
+
       let notificationToggle = new SettingField('', 'Enable notification sounds', null, notificationSwitch, { noteOnTop: true });
       other.append(notificationToggle);
 
       let selfPingToggle = new SettingField('', 'Enable own messages to trigger notifications.', null, selfPingSwitch, { noteOnTop: true });
       other.append(selfPingToggle);
+      
+      let allowWebhookToggle = new SettingField('', 'Enable sent webhooks to trigger notifications.', null, allowWebhookSwitch, { noteOnTop: true });
+      other.append(allowWebhookToggle);
 
       let ignoreuseridstip = new SettingField('', 'Ignore users here. One user ID per line. (Right click name -> Copy ID). Be sure developer options are on.', null, document.createElement('div'));
       other.append(ignoreuseridstip);
