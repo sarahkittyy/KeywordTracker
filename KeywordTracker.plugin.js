@@ -5,7 +5,7 @@
  * @donate https://paypal.me/sarahkittyy
  * @website https://github.com/sarahkittyy/KeywordTracker
  * @source https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
- * @version 1.3.6
+ * @version 1.3.7
  * @updateUrl https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
  */
 /*@cc_on
@@ -33,7 +33,7 @@
 @else@*/
 
 module.exports = (() => {
-    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.3.6","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"v1.3.6","items":["Fixed bug with indicator not showing up."]},{"title":"v1.3.5","items":["Fixed crash."]},{"title":"v1.3.4","items":["Removed unnecessary logging"]},{"title":"v1.3.3","items":["Fixed clicking to notifications not jumping to location"]},{"title":"v1.3.2","items":["Fixed notifications"]},{"title":"v1.3.1","items":["Fixed user whitelist typo (thanks SoftwareSing)"]},{"title":"v1.3.0","items":["Fixed issues caused by ZLib's update.","Added toggle to let your own messages trigger notifications. Good for testing :)","Inbox should now show up on languages that are not english."]},{"title":"v1.2.6","items":["Fixed inbox panel not showing up."]},{"title":"v1.2.5","items":["Fixed memory leak in inbox panel."]},{"title":"v1.2.4","items":["Fixed order of changelog.","Fixed the entire plugin, lol :)"]},{"title":"v1.2.3","items":["Fixed crashing issue related to jumping to a matched keyword."]},{"title":"v1.2.2","items":["Actually, for realsies, fixes the issue (Thanks Meduxa)"]},{"title":"v1.2.1","items":["Hopefully fixes the issue of the keyword inbox button not appearing on some clients."]},{"title":"v1.2.0","items":["Finally added an inbox, oh my god, why didn't I do this sooner.","You can find all recent missed matches from the last 60 days right next to the pinned messages button."]},{"title":"v1.1.1","items":["Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)","Updated README.md"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added server name in notification","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"Release","items":["Initial release."]}],"main":"index.js"};
+    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.3.7","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"v1.3.7","items":["A long requested feature: Keywords in embeds are now tracked! ^^"]},{"title":"v1.3.6","items":["Fixed bug with indicator not showing up."]},{"title":"v1.3.5","items":["Fixed crash."]},{"title":"v1.3.4","items":["Removed unnecessary logging"]},{"title":"v1.3.3","items":["Fixed clicking to notifications not jumping to location"]},{"title":"v1.3.2","items":["Fixed notifications"]},{"title":"v1.3.1","items":["Fixed user whitelist typo (thanks SoftwareSing)"]},{"title":"v1.3.0","items":["Fixed issues caused by ZLib's update.","Added toggle to let your own messages trigger notifications. Good for testing :)","Inbox should now show up on languages that are not english."]},{"title":"v1.2.6","items":["Fixed inbox panel not showing up."]},{"title":"v1.2.5","items":["Fixed memory leak in inbox panel."]},{"title":"v1.2.4","items":["Fixed order of changelog.","Fixed the entire plugin, lol :)"]},{"title":"v1.2.3","items":["Fixed crashing issue related to jumping to a matched keyword."]},{"title":"v1.2.2","items":["Actually, for realsies, fixes the issue (Thanks Meduxa)"]},{"title":"v1.2.1","items":["Hopefully fixes the issue of the keyword inbox button not appearing on some clients."]},{"title":"v1.2.0","items":["Finally added an inbox, oh my god, why didn't I do this sooner.","You can find all recent missed matches from the last 60 days right next to the pinned messages button."]},{"title":"v1.1.1","items":["Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)","Updated README.md"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added server name in notification","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"Release","items":["Initial release."]}],"main":"index.js"};
 
     return !global.ZeresPluginLibrary ? class {
         constructor() {this._config = config;}
@@ -167,6 +167,7 @@ module.exports = (() => {
     unreadMatches: {},
     notifications: true,
     allowSelf: false,
+		allowEmbeds: true,
   };
   const {
     DOMTools,
@@ -234,7 +235,8 @@ module.exports = (() => {
         if (this.settings.allowSelf === false && message.author.id === this.userId) return;
         // ignore ignored users
         if (this.settings.ignoredUsers.includes(message.author.id)) return;
-        if (!message.content) return;
+
+        if (!message.content && (!message.embeds || message.embeds.length === 0)) return;
 
         // no dms!
         if (!channel.guild_id) return;
@@ -285,7 +287,11 @@ module.exports = (() => {
             rx = new RegExp(RegexEscape(kw));
           }
 
-          if (rx.test(message.content)) {
+          if (rx.test(message.content) || (
+						message.embeds &&
+						this.settings.allowEmbeds &&
+						rx.test(JSON.stringify(message.embeds))
+					)) {
             let guild = guilds.find(g => g.id === channel.guild_id);
             this.pingSuccess(message, channel, guild.name, rx);
             return false; // stop searching
@@ -694,8 +700,16 @@ module.exports = (() => {
         this.saveSettings();
       });
 
+      let embedSwitch = this.makeSwitch(this.settings.allowEmbeds, (v) => {
+        this.settings.allowEmbeds = v;
+        this.saveSettings();
+      });
+
       let notificationToggle = new SettingField('', 'Enable notification sounds', null, notificationSwitch, { noteOnTop: true });
       other.append(notificationToggle);
+
+      let embedToggle = new SettingField('', 'Enable matching embed content.', null, embedSwitch, { noteOnTop: true });
+      other.append(embedToggle);
 
       let selfPingToggle = new SettingField('', 'Enable own messages to trigger notifications.', null, selfPingSwitch, { noteOnTop: true });
       other.append(selfPingToggle);
