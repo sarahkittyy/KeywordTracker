@@ -1,62 +1,301 @@
 /**
  * @name KeywordTracker
- * @invite 0Tmfo5ZbORCRqbAd
+ * @description Be notified when a message matches a keyword :)
+ * @version 1.4.5
+ * @author sawahkitty!~<3
+ * @authorId 135895345296048128
  * @authorLink https://github.com/sarahkittyy
- * @donate https://paypal.me/sarahkittyy
  * @website https://github.com/sarahkittyy/KeywordTracker
  * @source https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
- * @version 1.4.4
- * @updateUrl https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js
  */
 /*@cc_on
 @if (@_jscript)
-	
-	// Offer to self-install for clueless users that try to run this directly.
-	var shell = WScript.CreateObject("WScript.Shell");
-	var fs = new ActiveXObject("Scripting.FileSystemObject");
-	var pathPlugins = shell.ExpandEnvironmentStrings("%APPDATA%\BetterDiscord\plugins");
-	var pathSelf = WScript.ScriptFullName;
-	// Put the user at ease by addressing them in the first person
-	shell.Popup("It looks like you've mistakenly tried to run me directly. \n(Don't do that!)", 0, "I'm a plugin for BetterDiscord", 0x30);
-	if (fs.GetParentFolderName(pathSelf) === fs.GetAbsolutePathName(pathPlugins)) {
-		shell.Popup("I'm in the correct folder already.", 0, "I'm already installed", 0x40);
-	} else if (!fs.FolderExists(pathPlugins)) {
-		shell.Popup("I can't find the BetterDiscord plugins folder.\nAre you sure it's even installed?", 0, "Can't install myself", 0x10);
-	} else if (shell.Popup("Should I copy myself to BetterDiscord's plugins folder for you?", 0, "Do you need some help?", 0x34) === 6) {
-		fs.CopyFile(pathSelf, fs.BuildPath(pathPlugins, fs.GetFileName(pathSelf)), true);
-		// Show the user where to put plugins in the future
-		shell.Exec("explorer " + pathPlugins);
-		shell.Popup("I'm installed!", 0, "Successfully installed", 0x40);
-	}
-	WScript.Quit();
+    
+    // Offer to self-install for clueless users that try to run this directly.
+    var shell = WScript.CreateObject("WScript.Shell");
+    var fs = new ActiveXObject("Scripting.FileSystemObject");
+    var pathPlugins = shell.ExpandEnvironmentStrings("%APPDATA%\\BetterDiscord\\plugins");
+    var pathSelf = WScript.ScriptFullName;
+    // Put the user at ease by addressing them in the first person
+    shell.Popup("It looks like you've mistakenly tried to run me directly. \n(Don't do that!)", 0, "I'm a plugin for BetterDiscord", 0x30);
+    if (fs.GetParentFolderName(pathSelf) === fs.GetAbsolutePathName(pathPlugins)) {
+        shell.Popup("I'm in the correct folder already.", 0, "I'm already installed", 0x40);
+    } else if (!fs.FolderExists(pathPlugins)) {
+        shell.Popup("I can't find the BetterDiscord plugins folder.\nAre you sure it's even installed?", 0, "Can't install myself", 0x10);
+    } else if (shell.Popup("Should I copy myself to BetterDiscord's plugins folder for you?", 0, "Do you need some help?", 0x34) === 6) {
+        fs.CopyFile(pathSelf, fs.BuildPath(pathPlugins, fs.GetFileName(pathSelf)), true);
+        // Show the user where to put plugins in the future
+        shell.Exec("explorer " + pathPlugins);
+        shell.Popup("I'm installed!", 0, "Successfully installed", 0x40);
+    }
+    WScript.Quit();
 
 @else@*/
-
-module.exports = (() => {
-    const config = {"info":{"name":"KeywordTracker","authors":[{"name":"sawahkitty!~<3","discord_id":"135895345296048128","github_username":"sarahkittyy","twitter_username":"snuggleskittyy"}],"version":"1.4.4","description":"Be notified when a message matches a keyword :)","github":"https://github.com/sarahkittyy/KeywordTracker","github_raw":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js","authorLink":"https://github.com/sarahkittyy","inviteCode":"0Tmfo5ZbORCRqbAd","paypalLink":"https://paypal.me/sarahkittyy","updateUrl":"https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"},"changelog":[{"title":"v1.4.4","items":["Fixed settings panel from not showing up."]},{"title":"v1.4.3","items":["Fixed inbox not showing up."]},{"title":"v1.4.2","items":["Removed test console log"]},{"title":"v1.4.1","items":["Fixed after breaking discord update."]},{"title":"v1.4.0","items":["New user-keyword tracking! See keyword input description for details."]},{"title":"v1.3.9","items":["Fixed dirtyDispatch being removed"]},{"title":"v1.3.8","items":["Improved embeds to not track unnecessary words.","Allow bot messages to be enabled or disabled"]},{"title":"v1.3.7","items":["A long requested feature: Keywords in embeds are now tracked! ^^"]},{"title":"v1.3.6","items":["Fixed bug with indicator not showing up."]},{"title":"v1.3.5","items":["Fixed crash."]},{"title":"v1.3.4","items":["Removed unnecessary logging"]},{"title":"v1.3.3","items":["Fixed clicking to notifications not jumping to location"]},{"title":"v1.3.2","items":["Fixed notifications"]},{"title":"v1.3.1","items":["Fixed user whitelist typo (thanks SoftwareSing)"]},{"title":"v1.3.0","items":["Fixed issues caused by ZLib's update.","Added toggle to let your own messages trigger notifications. Good for testing :)","Inbox should now show up on languages that are not english."]},{"title":"v1.2.6","items":["Fixed inbox panel not showing up."]},{"title":"v1.2.5","items":["Fixed memory leak in inbox panel."]},{"title":"v1.2.4","items":["Fixed order of changelog.","Fixed the entire plugin, lol :)"]},{"title":"v1.2.3","items":["Fixed crashing issue related to jumping to a matched keyword."]},{"title":"v1.2.2","items":["Actually, for realsies, fixes the issue (Thanks Meduxa)"]},{"title":"v1.2.1","items":["Hopefully fixes the issue of the keyword inbox button not appearing on some clients."]},{"title":"v1.2.0","items":["Finally added an inbox, oh my god, why didn't I do this sooner.","You can find all recent missed matches from the last 60 days right next to the pinned messages button."]},{"title":"v1.1.1","items":["Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)","Updated README.md"]},{"title":"v1.1.0","items":["Updated descriptions for better clarity","Added server name in notification","Added more images","Added mass guild toggle switch","Added toggle switch to allow enabling / disabling of notification sounds.","Added field where you can exclude certain users from notifying you."]},{"title":"v1.0.7","items":["Added internal check to update when guild is newly joined"]},{"title":"v1.0.6","items":["Fixed version not showing up on BD website"]},{"title":"v1.0.5","items":["Fixed issue where notifications would not play a sound."]},{"title":"v1.0.4","items":["Set all channels to be enabled by default"]},{"title":"v1.0.3","items":["Fixed typo in RegexEscape","Changed notification icon to sender's profile picture"]},{"title":"v1.0.2","items":["Fixed dm channels causing console errors","Fixed update url"]},{"title":"v1.0.1","items":["Removed changes to global RegExp.escape","Updated meta info"]},{"title":"Release","items":["Initial release."]}],"main":"index.js"};
-
-    return !global.ZeresPluginLibrary ? class {
-        constructor() {this._config = config;}
-        getName() {return config.info.name;}
-        getAuthor() {return config.info.authors.map(a => a.name).join(", ");}
-        getDescription() {return config.info.description;}
-        getVersion() {return config.info.version;}
-        load() {
-            BdApi.showConfirmationModal("Library Missing", `The library plugin needed for ${config.info.name} is missing. Please click Download Now to install it.`, {
-                confirmText: "Download Now",
-                cancelText: "Cancel",
-                onConfirm: () => {
-                    require("request").get("https://rauenzi.github.io/BDPluginLibrary/release/0PluginLibrary.plugin.js", async (error, response, body) => {
-                        if (error) return require("electron").shell.openExternal("https://betterdiscord.net/ghdl?url=https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js");
-                        await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), body, r));
+const config = {
+    info: {
+        name: "KeywordTracker",
+        authors: [
+            {
+                name: "sawahkitty!~<3",
+                discord_id: "135895345296048128",
+                github_username: "sarahkittyy",
+                twitter_username: "snuggleskittyy"
+            }
+        ],
+        version: "1.4.5",
+        description: "Be notified when a message matches a keyword :)",
+        github: "https://github.com/sarahkittyy/KeywordTracker",
+        github_raw: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js",
+        authorLink: "https://github.com/sarahkittyy",
+        inviteCode: "0Tmfo5ZbORCRqbAd",
+        paypalLink: "https://paypal.me/sarahkittyy",
+        updateUrl: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"
+    },
+    changelog: [
+        {
+            title: "v1.4.5",
+            items: [
+                "Fixed for latest discord update."
+            ]
+        },
+        {
+            title: "v1.4.4",
+            items: [
+                "Fixed settings panel from not showing up."
+            ]
+        },
+        {
+            title: "v1.4.3",
+            items: [
+                "Fixed inbox not showing up."
+            ]
+        },
+        {
+            title: "v1.4.2",
+            items: [
+                "Removed test console log"
+            ]
+        },
+        {
+            title: "v1.4.1",
+            items: [
+                "Fixed after breaking discord update."
+            ]
+        },
+        {
+            title: "v1.4.0",
+            items: [
+                "New user-keyword tracking! See keyword input description for details."
+            ]
+        },
+        {
+            title: "v1.3.9",
+            items: [
+                "Fixed dirtyDispatch being removed"
+            ]
+        },
+        {
+            title: "v1.3.8",
+            items: [
+                "Improved embeds to not track unnecessary words.",
+                "Allow bot messages to be enabled or disabled"
+            ]
+        },
+        {
+            title: "v1.3.7",
+            items: [
+                "A long requested feature: Keywords in embeds are now tracked! ^^"
+            ]
+        },
+        {
+            title: "v1.3.6",
+            items: [
+                "Fixed bug with indicator not showing up."
+            ]
+        },
+        {
+            title: "v1.3.5",
+            items: [
+                "Fixed crash."
+            ]
+        },
+        {
+            title: "v1.3.4",
+            items: [
+                "Removed unnecessary logging"
+            ]
+        },
+        {
+            title: "v1.3.3",
+            items: [
+                "Fixed clicking to notifications not jumping to location"
+            ]
+        },
+        {
+            title: "v1.3.2",
+            items: [
+                "Fixed notifications"
+            ]
+        },
+        {
+            title: "v1.3.1",
+            items: [
+                "Fixed user whitelist typo (thanks SoftwareSing)"
+            ]
+        },
+        {
+            title: "v1.3.0",
+            items: [
+                "Fixed issues caused by ZLib's update.",
+                "Added toggle to let your own messages trigger notifications. Good for testing :)",
+                "Inbox should now show up on languages that are not english."
+            ]
+        },
+        {
+            title: "v1.2.6",
+            items: [
+                "Fixed inbox panel not showing up."
+            ]
+        },
+        {
+            title: "v1.2.5",
+            items: [
+                "Fixed memory leak in inbox panel."
+            ]
+        },
+        {
+            title: "v1.2.4",
+            items: [
+                "Fixed order of changelog.",
+                "Fixed the entire plugin, lol :)"
+            ]
+        },
+        {
+            title: "v1.2.3",
+            items: [
+                "Fixed crashing issue related to jumping to a matched keyword."
+            ]
+        },
+        {
+            title: "v1.2.2",
+            items: [
+                "Actually, for realsies, fixes the issue (Thanks Meduxa)"
+            ]
+        },
+        {
+            title: "v1.2.1",
+            items: [
+                "Hopefully fixes the issue of the keyword inbox button not appearing on some clients."
+            ]
+        },
+        {
+            title: "v1.2.0",
+            items: [
+                "Finally added an inbox, oh my god, why didn't I do this sooner.",
+                "You can find all recent missed matches from the last 60 days right next to the pinned messages button."
+            ]
+        },
+        {
+            title: "v1.1.1",
+            items: [
+                "Added user whitelist to receive all messages from a specific user. (Thank you @infernix!)",
+                "Updated README.md"
+            ]
+        },
+        {
+            title: "v1.1.0",
+            items: [
+                "Updated descriptions for better clarity",
+                "Added server name in notification",
+                "Added more images",
+                "Added mass guild toggle switch",
+                "Added toggle switch to allow enabling / disabling of notification sounds.",
+                "Added field where you can exclude certain users from notifying you."
+            ]
+        },
+        {
+            title: "v1.0.7",
+            items: [
+                "Added internal check to update when guild is newly joined"
+            ]
+        },
+        {
+            title: "v1.0.6",
+            items: [
+                "Fixed version not showing up on BD website"
+            ]
+        },
+        {
+            title: "v1.0.5",
+            items: [
+                "Fixed issue where notifications would not play a sound."
+            ]
+        },
+        {
+            title: "v1.0.4",
+            items: [
+                "Set all channels to be enabled by default"
+            ]
+        },
+        {
+            title: "v1.0.3",
+            items: [
+                "Fixed typo in RegexEscape",
+                "Changed notification icon to sender's profile picture"
+            ]
+        },
+        {
+            title: "v1.0.2",
+            items: [
+                "Fixed dm channels causing console errors",
+                "Fixed update url"
+            ]
+        },
+        {
+            title: "v1.0.1",
+            items: [
+                "Removed changes to global RegExp.escape",
+                "Updated meta info"
+            ]
+        },
+        {
+            title: "Release",
+            items: [
+                "Initial release."
+            ]
+        }
+    ],
+    main: "index.js"
+};
+class Dummy {
+    constructor() {this._config = config;}
+    start() {}
+    stop() {}
+}
+ 
+if (!global.ZeresPluginLibrary) {
+    BdApi.showConfirmationModal("Library Missing", `The library plugin needed for ${config.name ?? config.info.name} is missing. Please click Download Now to install it.`, {
+        confirmText: "Download Now",
+        cancelText: "Cancel",
+        onConfirm: () => {
+            require("request").get("https://betterdiscord.app/gh-redirect?id=9", async (err, resp, body) => {
+                if (err) return require("electron").shell.openExternal("https://betterdiscord.app/Download?id=9");
+                if (resp.statusCode === 302) {
+                    require("request").get(resp.headers.location, async (error, response, content) => {
+                        if (error) return require("electron").shell.openExternal("https://betterdiscord.app/Download?id=9");
+                        await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), content, r));
                     });
+                }
+                else {
+                    await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), body, r));
                 }
             });
         }
-        start() {}
-        stop() {}
-    } : (([Plugin, Api]) => {
-        const plugin = (Plugin, Library) => {
+    });
+}
+ 
+module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
+     const plugin = (Plugin, Library) => {
   const switchCss = `/** Switch
  -------------------------------------*/
 
@@ -158,6 +397,8 @@ module.exports = (() => {
 	transform: translateY(2px);
 }
 `;
+	const iconSVG = `<path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M8.627,7.885C8.499,8.388,7.873,8.101,8.13,8.177L4.12,7.143c-0.218-0.057-0.351-0.28-0.293-0.498c0.057-0.218,0.279-0.351,0.497-0.294l4.011,1.037C8.552,7.444,8.685,7.667,8.627,7.885 M8.334,10.123L4.323,9.086C4.105,9.031,3.883,9.162,3.826,9.38C3.769,9.598,3.901,9.82,4.12,9.877l4.01,1.037c-0.262-0.062,0.373,0.192,0.497-0.294C8.685,10.401,8.552,10.18,8.334,10.123 M7.131,12.507L4.323,11.78c-0.218-0.057-0.44,0.076-0.497,0.295c-0.057,0.218,0.075,0.439,0.293,0.495l2.809,0.726c-0.265-0.062,0.37,0.193,0.495-0.293C7.48,12.784,7.35,12.562,7.131,12.507M18.159,3.677v10.701c0,0.186-0.126,0.348-0.306,0.393l-7.755,1.948c-0.07,0.016-0.134,0.016-0.204,0l-7.748-1.948c-0.179-0.045-0.306-0.207-0.306-0.393V3.677c0-0.267,0.249-0.461,0.509-0.396l7.646,1.921l7.654-1.921C17.91,3.216,18.159,3.41,18.159,3.677 M9.589,5.939L2.656,4.203v9.857l6.933,1.737V5.939z M17.344,4.203l-6.939,1.736v9.859l6.939-1.737V4.203z M16.168,6.645c-0.058-0.218-0.279-0.351-0.498-0.294l-4.011,1.037c-0.218,0.057-0.351,0.28-0.293,0.498c0.128,0.503,0.755,0.216,0.498,0.292l4.009-1.034C16.092,7.085,16.225,6.863,16.168,6.645 M16.168,9.38c-0.058-0.218-0.279-0.349-0.498-0.294l-4.011,1.036c-0.218,0.057-0.351,0.279-0.293,0.498c0.124,0.486,0.759,0.232,0.498,0.294l4.009-1.037C16.092,9.82,16.225,9.598,16.168,9.38 M14.963,12.385c-0.055-0.219-0.276-0.35-0.495-0.294l-2.809,0.726c-0.218,0.056-0.351,0.279-0.293,0.496c0.127,0.506,0.755,0.218,0.498,0.293l2.807-0.723C14.89,12.825,15.021,12.603,14.963,12.385"></path>
+`;
   const defaultSettings = {
     whitelistedUsers: [],
     keywords: [],
@@ -171,44 +412,57 @@ module.exports = (() => {
 		allowBots: true,
   };
   const {
-    DOMTools,
-    Patcher,
+		ReactTools,
     Logger,
     Settings,
     Utilities,
     PluginUtilities,
-    ReactTools,
     Modals,
     Tooltip,
     Toasts: Toast,
     DiscordModules: Modules,
-		WebpackModules,
   } = Library;
+	const {
+		Patcher,
+		Webpack,
+		DOM,
+		ReactUtils,
+	} = BdApi;
 
   const RegexEscape = function(string) {
     return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   };
 
   return class KeywordTracker extends Plugin {
+		/**
+		 * Plugin init
+		 *
+		 * @async
+		 */
     async onStart() {
-      this.cancelPatches = [];
-      this.loadSettings();
       PluginUtilities.addStyle(this.getName(), switchCss);
       PluginUtilities.addStyle(this.getName(), inboxCss);
+      this.loadSettings();
+      this.inboxPanel = null;
 
       let dispatchModule = BdApi.findModuleByProps('dispatch', 'subscribe');
-      BdApi.Patcher.after(this.getName(), dispatchModule, 'dispatch', this.handleMessage.bind(this));
+      Patcher.after(this.getName(), dispatchModule, 'dispatch', this.handleMessage.bind(this));
 
-      const TitleBar = WebpackModules.getModule(m => Object.values(m).some(m => m?.Title && m?.Caret && m?.toString?.()?.includes('toolbar')), { searchGetters: false });
-      this.inboxPanel = null;
-      Patcher.after(TitleBar, "ZP", (self, [props], ret) => {
+			const stringFilter = BdApi.Webpack.Filters.byStrings(".GUILD_HOME");
+			const keyFilter = BdApi.Webpack.Filters.byKeys("Icon", "Title");
+
+			// patch the title bar to add the inbox button
+			const [ titlebarModule, titlebarKey ] =BdApi.Webpack.getWithKey((m) => keyFilter(m) && !stringFilter(m));
+			Patcher.before(this.getName(), titlebarModule, titlebarKey, (that, [ props ]) => {
         if (props.toolbar.type === 'function') return;
-        if (this.inboxPanel == null) {
+        if (this.inboxPanel == null) { // build the panel if it's not already built
           this.inboxPanel = this.buildInboxPanel();
         }
-				if (typeof props.toolbar.props.children[0].splice !== 'function') return;
-				props.toolbar.props.children[0].splice(Math.max(3, props.toolbar.props.children[0].length - 1), 0, this.inboxPanel);
-      });
+				if (typeof props.toolbar.props.children[0].splice !== 'function') return; // make sure the splice function exists :p
+				let idx = Math.max(3, props.toolbar.props.children[0].length - 1);
+				// insert the panel
+				props.toolbar.props.children[0].splice(idx, 0, this.inboxPanel);
+			});
 
       this.userId = Modules.UserStore.getCurrentUser().id;
     }
@@ -216,7 +470,7 @@ module.exports = (() => {
     onStop() {
       this.saveSettings();
 
-      BdApi.Patcher.unpatchAll(this.getName());
+      Patcher.unpatchAll(this.getName());
       PluginUtilities.removeStyle(this.getName());
     }
 
@@ -386,6 +640,13 @@ module.exports = (() => {
       this.saveSettings();
     }
 
+		/**
+		 * A single on/off switch
+		 *
+		 * @param {bool} iv - the initial state of the switch
+		 * @param {function} callback - the function to run when the switch is flipped
+		 * @returns {html} html element
+		 */
     makeSwitch(iv, callback) {
       let label = document.createElement('label');
       label.className = 'switch';
@@ -401,16 +662,28 @@ module.exports = (() => {
       return label;
     }
 
+		/**
+		 * For Zere's to render the settings panel.
+		 *
+		 */
     getSettingsPanel() {
       return this.buildSettings().getElement();
     }
 
+		/**
+		 * Saves settings to file.
+		 *
+		 */
     saveSettings() {
-      // clear out empty keywords :)
+      // clears out empty keywords before saving :)
       this.settings.keywords = this.settings.keywords.filter((v) => v.trim().length > 0);
       PluginUtilities.saveSettings('KeywordTracker', this.settings);
     }
 
+		/**
+		 * Loads settings from storage.
+		 *
+		 */
     loadSettings() {
       // load settings
       this.settings = Utilities.deepclone(PluginUtilities.loadSettings('KeywordTracker', defaultSettings));
@@ -418,7 +691,7 @@ module.exports = (() => {
 
     // build the inbox panel placed directly after the pinned messages button
     buildInboxPanel() {
-      let pinned = document.querySelector('div[class*="toolbar-3" i] > div:first-child');
+      let pinned = document.querySelector('div[class*="toolbar" i] > div:first-child');
       if (!pinned) {
         return;
       }
@@ -431,7 +704,6 @@ module.exports = (() => {
       let icon = inbox.querySelector('svg');
       icon.setAttribute('viewBox', '0 0 20 20');
       // icon!
-      let iconSVG = `<path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M8.627,7.885C8.499,8.388,7.873,8.101,8.13,8.177L4.12,7.143c-0.218-0.057-0.351-0.28-0.293-0.498c0.057-0.218,0.279-0.351,0.497-0.294l4.011,1.037C8.552,7.444,8.685,7.667,8.627,7.885 M8.334,10.123L4.323,9.086C4.105,9.031,3.883,9.162,3.826,9.38C3.769,9.598,3.901,9.82,4.12,9.877l4.01,1.037c-0.262-0.062,0.373,0.192,0.497-0.294C8.685,10.401,8.552,10.18,8.334,10.123 M7.131,12.507L4.323,11.78c-0.218-0.057-0.44,0.076-0.497,0.295c-0.057,0.218,0.075,0.439,0.293,0.495l2.809,0.726c-0.265-0.062,0.37,0.193,0.495-0.293C7.48,12.784,7.35,12.562,7.131,12.507M18.159,3.677v10.701c0,0.186-0.126,0.348-0.306,0.393l-7.755,1.948c-0.07,0.016-0.134,0.016-0.204,0l-7.748-1.948c-0.179-0.045-0.306-0.207-0.306-0.393V3.677c0-0.267,0.249-0.461,0.509-0.396l7.646,1.921l7.654-1.921C17.91,3.216,18.159,3.41,18.159,3.677 M9.589,5.939L2.656,4.203v9.857l6.933,1.737V5.939z M17.344,4.203l-6.939,1.736v9.859l6.939-1.737V4.203z M16.168,6.645c-0.058-0.218-0.279-0.351-0.498-0.294l-4.011,1.037c-0.218,0.057-0.351,0.28-0.293,0.498c0.128,0.503,0.755,0.216,0.498,0.292l4.009-1.034C16.092,7.085,16.225,6.863,16.168,6.645 M16.168,9.38c-0.058-0.218-0.279-0.349-0.498-0.294l-4.011,1.036c-0.218,0.057-0.351,0.279-0.293,0.498c0.124,0.486,0.759,0.232,0.498,0.294l4.009-1.037C16.092,9.82,16.225,9.598,16.168,9.38 M14.963,12.385c-0.055-0.219-0.276-0.35-0.495-0.294l-2.809,0.726c-0.218,0.056-0.351,0.279-0.293,0.496c0.127,0.506,0.755,0.218,0.498,0.293l2.807-0.723C14.89,12.825,15.021,12.603,14.963,12.385"></path>`;
       icon.innerHTML = iconSVG;
       inbox.appendChild(icon);
 
@@ -566,7 +838,7 @@ module.exports = (() => {
                         g.channels = Modules.GuildChannelsStore.getChannels(g.id).SELECTABLE.map(c => c.channel);
                         return g;
                       });
-      const { parseHTML } = DOMTools;
+      const { parseHTML } = DOM;
 
       // when the main guild switch is hit this event is fired, causing all channel switches to sync
       const GuildFlushEvent = new Event('guildflushevent');
@@ -792,7 +1064,6 @@ module.exports = (() => {
     }
   };
 };
-        return plugin(Plugin, Api);
-    })(global.ZeresPluginLibrary.buildPlugin(config));
-})();
+     return plugin(Plugin, Api);
+})(global.ZeresPluginLibrary.buildPlugin(config));
 /*@end@*/
