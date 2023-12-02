@@ -1,7 +1,7 @@
 /**
  * @name KeywordTracker
  * @description Be notified when a message matches a keyword :)
- * @version 1.4.5
+ * @version 1.4.6
  * @author sawahkitty!~<3
  * @authorId 135895345296048128
  * @authorLink https://github.com/sarahkittyy
@@ -42,7 +42,7 @@ const config = {
                 twitter_username: "snuggleskittyy"
             }
         ],
-        version: "1.4.5",
+        version: "1.4.6",
         description: "Be notified when a message matches a keyword :)",
         github: "https://github.com/sarahkittyy/KeywordTracker",
         github_raw: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js",
@@ -52,6 +52,12 @@ const config = {
         updateUrl: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"
     },
     changelog: [
+        {
+            title: "v1.4.6",
+            items: [
+                "Bugfixes"
+            ]
+        },
         {
             title: "v1.4.5",
             items: [
@@ -759,7 +765,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 
           let timestamp = document.createElement('span');
           timestamp.className = 'timestamp';
-          timestamp.innerHTML = `${new Date(msg.timestamp).toLocaleString()}`;
+          timestamp.textContent = `${new Date(msg.timestamp).toLocaleString()}`;
           entry.appendChild(timestamp);
 
           let icon = document.createElement('img');
@@ -770,19 +776,19 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 
           let username = document.createElement('span');
           username.className = 'username';
-          username.innerHTML = `${msg.author.username}: `;
+          username.textContent = `${msg.author.username}: `;
           entry.appendChild(username);
           
           let content = document.createElement('span');
           content.className = 'content';
-          content.innerHTML = msg.content;
+          content.textContent = msg.content;
           entry.appendChild(content);
 
           entry.appendChild(document.createElement('br'));
 
           let matched = document.createElement('span');
           matched.className = 'matched';
-          matched.innerHTML = `Matched ${msg._match}`;
+          matched.textContent = `Matched ${msg._match}`;
           entry.appendChild(matched);
 
           let markRead = document.createElement('button');
@@ -791,7 +797,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             this.saveSettings();
             root.dispatchEvent(EntryFlushEvent);
           });
-          markRead.innerHTML = 'Mark as Read';
+          markRead.textContent = 'Mark as Read';
           entry.appendChild(markRead);
 
           let jump = document.createElement('button');
@@ -805,13 +811,13 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
               undefined,
             );
           });
-          jump.innerHTML = 'Jump';
+          jump.textContent = 'Jump';
           entry.appendChild(jump);
 
           return entry;
         };
         if (sortedMatches.length === 0) {
-          root.innerHTML = 'No recent matches.';
+          root.textContent = 'No recent matches.';
           root.setAttribute('style', 'line-height: 90px; text-align: center;');
         } else {
           for(let msg of sortedMatches) {
@@ -822,7 +828,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
       setupEntries();
 
       root.addEventListener('entryflush', () => {
-        root.innerHTML = '';
+        root.textContent = '';
         setupEntries();
       });
 
