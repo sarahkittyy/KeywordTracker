@@ -1,7 +1,7 @@
 /**
  * @name KeywordTracker
  * @description Be notified when a message matches a keyword :)
- * @version 1.5.0
+ * @version 1.5.1
  * @author sawahkitty!~<3
  * @authorId 135895345296048128
  * @authorLink https://github.com/sarahkittyy
@@ -42,7 +42,7 @@ const config = {
                 twitter_username: "snuggleskittyy"
             }
         ],
-        version: "1.5.0",
+        version: "1.5.1",
         description: "Be notified when a message matches a keyword :)",
         github: "https://github.com/sarahkittyy/KeywordTracker",
         github_raw: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js",
