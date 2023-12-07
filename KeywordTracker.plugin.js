@@ -10,7 +10,7 @@
  */
 /*@cc_on
 @if (@_jscript)
-    
+
     // Offer to self-install for clueless users that try to run this directly.
     var shell = WScript.CreateObject("WScript.Shell");
     var fs = new ActiveXObject("Scripting.FileSystemObject");
@@ -297,7 +297,7 @@ class Dummy {
     start() {}
     stop() {}
 }
- 
+
 if (!global.ZeresPluginLibrary) {
     BdApi.showConfirmationModal("Library Missing", `The library plugin needed for ${config.name ?? config.info.name} is missing. Please click Download Now to install it.`, {
         confirmText: "Download Now",
@@ -318,7 +318,7 @@ if (!global.ZeresPluginLibrary) {
         }
     });
 }
- 
+
 module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
      const plugin = (Plugin, Library) => {
   const switchCss = `/** Switch
@@ -589,8 +589,8 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
           this.settings.guilds[g.id] = {
             // set all channels to enabled by default
             channels: g.channels
-              .filter(c => c.type === 'GUILD_TEXT')
-              .reduce((obj, c) => {
+              ?.filter(c => c.type === 'GUILD_TEXT')
+              ?.reduce((obj, c) => {
                 obj[c.id] = true;
                 return obj;
               }, {}),
@@ -619,7 +619,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         // run through every single keyword as a regex
         this.settings.keywords.every((keyword) => {
           let regex = undefined; // the regex to run on the message content
-					let filter = undefined; 
+					let filter = undefined;
 					// retrieve the filter (user, channel, server) if there is any
 					//                 type    id    regex
 					let isFiltered = /^([@#]?)(\d+):(.*)$/g.exec(keyword);
@@ -744,7 +744,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
       let div = document.createElement('div');
       label.append(input);
       label.append(div);
-      input.addEventListener('input', function (e) { 
+      input.addEventListener('input', function (e) {
         callback(this.checked);
       });
       return label;
@@ -940,7 +940,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
       keywords.append(tip3);
       let tip4 = new SettingField('', '1239871234:/\d+/i watches numbers from server id 1239871234 (Right click server -> Copy Server ID, requires developer mode)', null, document.createElement('div'));
       keywords.append(tip4);
-      
+
       // add keyword textbox
       let textbox = document.createElement('textarea');
       textbox.value = this.settings.keywords.join('\n');
