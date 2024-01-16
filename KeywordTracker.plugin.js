@@ -902,7 +902,11 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         };
         if (sortedMatches.length === 0) {
           root.textContent = 'No recent matches.';
+<<<<<<< HEAD
           root.setAttribute('style', 'line-height: 90px; text-align: center;  color: var(--text-normal);');
+=======
+          root.setAttribute('style', 'line-height: 90px; text-align: center;');
+>>>>>>> 44edde668dfd4f43026ff399cca5400c259666ab
         } else {
           for(let msg of sortedMatches) {
             root.appendChild(matchEntry(msg));

@@ -4,9 +4,9 @@ Allows you to set keywords, and servers to watch, so that you get notifications 
 
 Built off [zlib](https://github.com/rauenzi/BDPluginLibrary).
 
-## Note to developers
+## This is a build artifact
 
-Please submit your pull requests [here](https://github.com/sarahkittyy/KeywordTrackerSource). :)
+View and edit the source here: https://github.com/sarahkittyy/KeywordTrackerSource
 
 ## Screenshots
 
