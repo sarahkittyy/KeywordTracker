@@ -1,7 +1,7 @@
 /**
  * @name KeywordTracker
  * @description Be notified when a message matches a keyword :)
- * @version 1.4.5
+ * @version 1.5.2
  * @author sawahkitty!~<3
  * @authorId 135895345296048128
  * @authorLink https://github.com/sarahkittyy
@@ -42,7 +42,7 @@ const config = {
                 twitter_username: "snuggleskittyy"
             }
         ],
-        version: "1.4.5",
+        version: "1.5.2",
         description: "Be notified when a message matches a keyword :)",
         github: "https://github.com/sarahkittyy/KeywordTracker",
         github_raw: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js",
@@ -52,6 +52,37 @@ const config = {
         updateUrl: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"
     },
     changelog: [
+        {
+            title: "v1.5.2",
+            items: [
+                "Fixed incorrect text coloring in empty inbox."
+            ]
+        },
+        {
+            title: "v1.5.1",
+            items: [
+                "Fixed light theme channel colors.",
+                "Removed titles from marked as read and jump to buttons (replaced by tooltips)"
+            ]
+        },
+        {
+            title: "v1.5.0",
+            items: [
+                "Improved inbox icon",
+                "Fixed(?) weird line divider in the toolbar sometimes",
+                "No longer marks jumped-to messages as read by default.",
+                "Added an option in settings to mark messages as read when jumping to them.",
+                "Keywords can be filtered to just specific users, specific channels, and specific servers. Highly request feature I think!!! :3",
+                "Brand new inbox panel with cleaner buttons and pretty regex markdown!! Thank you ewan for the pr :3.",
+                "Cleanups and bugfixes"
+            ]
+        },
+        {
+            title: "v1.4.6",
+            items: [
+                "Bugfixes"
+            ]
+        },
         {
             title: "v1.4.5",
             items: [
@@ -335,70 +366,108 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 }
 
 `;
-  const inboxCss = `.kt-inbox-container {
-	color: white;
+  const inboxCss = `.kt-inbox-entry {
+  padding: 5px;
+  color: var(--text-normal);
 }
 
-.kt-inbox-entry {
-	color: white;
-	padding: 5px;
-	padding-bottom: 10px;
-	margin: 10px;
-	margin-top: 0px;
-	margin-bottom: 0px;
-	border-bottom: 1px solid #444;
-	line-height: 22px;
+.kt-inbox-entry:not(:last-child) {
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--background-secondary-alt);
 }
 
-.kt-inbox-entry > .timestamp {
-	font-size: 8pt;
-	color: #888;
+.kt-spacer {
+  flex: 1;
 }
 
-.kt-inbox-entry > .usericon {
-	max-width: 24px;
-	max-height: 24px;
-	transform: translateY(8px);
-	margin-left: 5px;
-	border-radius: 50%;
+.kt-entry-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.kt-inbox-entry > .username {
-	margin-left: 5px;
+.kt-usericon {
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
 }
 
-.kt-inbox-entry > .content {
-	color: #88a;
+.kt-username {
+  color: var(--text-normal);
+  margin-left: -2px;
 }
 
-.kt-inbox-entry > .matched {
-	font-size: 10pt;
-	color: #abc;
+.kt-channel-container {
+	width: 95%;
+	margin-left: 2.5%;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 3px;
 }
 
-.kt-inbox-entry > button {
-	display: inline-block;
-	font-family: Whitney, "Open Sans", Helvetica, sans-serif;
-	font-weight: 400;
-	font-size: 11pt;
-	border-radius: 3px;
-	cursor: pointer;
-	width: auto;
-	height: auto;
-	box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
-	background-color: #7289da;
-	border: 2px solid #7289da;
-	color: #fff;
-	margin-left: 5px;
-	transition: all 200ms;
+.kt-channel-name {
+  color: var(--header-primary);
+  font-size: 16px;
 }
 
-.kt-inbox-entry > button:active {
-	transform: translateY(2px);
+.kt-timestamp {
+  color: var(--text-muted);
+  font-size: .75rem;
 }
-`;
-	const iconSVG = `<path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M8.627,7.885C8.499,8.388,7.873,8.101,8.13,8.177L4.12,7.143c-0.218-0.057-0.351-0.28-0.293-0.498c0.057-0.218,0.279-0.351,0.497-0.294l4.011,1.037C8.552,7.444,8.685,7.667,8.627,7.885 M8.334,10.123L4.323,9.086C4.105,9.031,3.883,9.162,3.826,9.38C3.769,9.598,3.901,9.82,4.12,9.877l4.01,1.037c-0.262-0.062,0.373,0.192,0.497-0.294C8.685,10.401,8.552,10.18,8.334,10.123 M7.131,12.507L4.323,11.78c-0.218-0.057-0.44,0.076-0.497,0.295c-0.057,0.218,0.075,0.439,0.293,0.495l2.809,0.726c-0.265-0.062,0.37,0.193,0.495-0.293C7.48,12.784,7.35,12.562,7.131,12.507M18.159,3.677v10.701c0,0.186-0.126,0.348-0.306,0.393l-7.755,1.948c-0.07,0.016-0.134,0.016-0.204,0l-7.748-1.948c-0.179-0.045-0.306-0.207-0.306-0.393V3.677c0-0.267,0.249-0.461,0.509-0.396l7.646,1.921l7.654-1.921C17.91,3.216,18.159,3.41,18.159,3.677 M9.589,5.939L2.656,4.203v9.857l6.933,1.737V5.939z M17.344,4.203l-6.939,1.736v9.859l6.939-1.737V4.203z M16.168,6.645c-0.058-0.218-0.279-0.351-0.498-0.294l-4.011,1.037c-0.218,0.057-0.351,0.28-0.293,0.498c0.128,0.503,0.755,0.216,0.498,0.292l4.009-1.034C16.092,7.085,16.225,6.863,16.168,6.645 M16.168,9.38c-0.058-0.218-0.279-0.349-0.498-0.294l-4.011,1.036c-0.218,0.057-0.351,0.279-0.293,0.498c0.124,0.486,0.759,0.232,0.498,0.294l4.009-1.037C16.092,9.82,16.225,9.598,16.168,9.38 M14.963,12.385c-0.055-0.219-0.276-0.35-0.495-0.294l-2.809,0.726c-0.218,0.056-0.351,0.279-0.293,0.496c0.127,0.506,0.755,0.218,0.498,0.293l2.807-0.723C14.89,12.825,15.021,12.603,14.963,12.385"></path>
-`;
+
+.kt-content {
+  padding: 8px 0 5px;
+  line-height: 1.25rem;
+}
+
+.kt-matched {
+  color: var(--text-muted);
+  font-size: .75rem;
+  display: flex;
+  align-items: center;
+}
+
+.kt-matched > code {
+  background-color: var(--background-secondary);
+  font-size: .75rem;
+  border: 1px solid var(--background-tertiary);
+  border-radius: 4px;
+  padding: 3px 5px;
+  margin-left: 3px;
+  color: var(--text-secondary);
+  max-width: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 250px;
+  display: inline-block;
+  text-overflow: ellipsis;
+}
+
+.kt-button {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background-color: var(--background-secondary-alt);
+  transition: background-color .2s;
+}
+
+.kt-button:hover {
+  background-color: var(--background-tertiary);
+}
+
+.kt-button path {
+  transition: fill .2s;
+}
+
+.kt-button:hover path {
+  fill: var(--interactive-active);
+}`;
+	const iconSVG = `<path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M12,73.51q.2-34.74.39-69.38A3.21,3.21,0,0,1,15,1h0C23.4-.75,36.64-.31,45.63,3.14a35.46,35.46,0,0,1,16,11.65,37.34,37.34,0,0,1,16-11.15C86.12.4,99-.38,108.23,1A3.2,3.2,0,0,1,111,4.14h0V73.8A3.21,3.21,0,0,1,107.77,77a3.49,3.49,0,0,1-.74-.09A53.45,53.45,0,0,0,83.58,79.1a71,71,0,0,0-15.77,8.26,69.09,69.09,0,0,1,21.24-3.1,125.42,125.42,0,0,1,27.41,3.48V14.84h3.21a3.21,3.21,0,0,1,3.21,3.21V91.94a3.21,3.21,0,0,1-3.21,3.21,3.18,3.18,0,0,1-1-.17A121.77,121.77,0,0,0,89,90.65a61.89,61.89,0,0,0-25.76,5.26,3.39,3.39,0,0,1-3.64,0,61.86,61.86,0,0,0-25.76-5.26A121.77,121.77,0,0,0,4.24,95a3.18,3.18,0,0,1-1,.17A3.21,3.21,0,0,1,0,91.94V18.05a3.21,3.21,0,0,1,3.21-3.21H6.42v72.9a125.42,125.42,0,0,1,27.41-3.48,68.84,68.84,0,0,1,22.71,3.57A48.7,48.7,0,0,0,41,79.39c-7-2.3-17.68-3.07-25.49-2.4A3.21,3.21,0,0,1,12,74.06a5,5,0,0,1,0-.55ZM73.64,64.4a2.3,2.3,0,1,1-2.5-3.85,51.46,51.46,0,0,1,11.8-5.4,53.73,53.73,0,0,1,13-2.67,2.29,2.29,0,1,1,.25,4.58,49.42,49.42,0,0,0-11.79,2.46A46.73,46.73,0,0,0,73.64,64.4Zm.2-17.76a2.29,2.29,0,0,1-2.46-3.87,52.71,52.71,0,0,1,11.74-5.3A54.12,54.12,0,0,1,95.9,34.85a2.3,2.3,0,0,1,.25,4.59,49.3,49.3,0,0,0-11.63,2.4,48,48,0,0,0-10.68,4.8Zm.06-17.7a2.3,2.3,0,1,1-2.46-3.89,52.54,52.54,0,0,1,11.72-5.27,53.71,53.71,0,0,1,12.74-2.6,2.29,2.29,0,1,1,.25,4.58,49.35,49.35,0,0,0-11.59,2.39A47.91,47.91,0,0,0,73.9,28.94ZM51.74,60.55a2.3,2.3,0,1,1-2.5,3.85,46.73,46.73,0,0,0-10.72-4.88,49.42,49.42,0,0,0-11.79-2.46A2.29,2.29,0,1,1,27,52.48a53.73,53.73,0,0,1,13,2.67,51.46,51.46,0,0,1,11.8,5.4ZM51.5,42.77A2.29,2.29,0,0,1,49,46.64a48,48,0,0,0-10.68-4.8,49.3,49.3,0,0,0-11.63-2.4A2.3,2.3,0,0,1,27,34.85a54.12,54.12,0,0,1,12.78,2.62,52.71,52.71,0,0,1,11.74,5.3Zm-.06-17.72A2.3,2.3,0,1,1,49,28.94a47.91,47.91,0,0,0-10.66-4.79,49.35,49.35,0,0,0-11.59-2.39A2.29,2.29,0,1,1,27,17.18a53.71,53.71,0,0,1,12.74,2.6,52.54,52.54,0,0,1,11.72,5.27ZM104.56,7c-7.42-.7-18.06.12-24.73,2.65A30,30,0,0,0,64.7,21.46V81.72a76.76,76.76,0,0,1,16.72-8.66,62.85,62.85,0,0,1,23.14-2.87V7ZM58.28,81.1V21.37c-3.36-5.93-8.79-9.89-14.93-12.24-7-2.67-17.75-3.27-24.56-2.3l-.36,63.56c7.43-.27,17.69.68,24.52,2.91a54.94,54.94,0,0,1,15.33,7.8Z"/></path>`;
   const defaultSettings = {
     whitelistedUsers: [],
     keywords: [],
@@ -410,6 +479,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     allowSelf: false,
 		allowEmbeds: true,
 		allowBots: true,
+		markJumpedRead: false,
   };
   const {
 		ReactTools,
@@ -433,6 +503,10 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   };
 
+	const log = (...args) => {
+		Logger.info(...args);
+	};
+
   return class KeywordTracker extends Plugin {
 		/**
 		 * Plugin init
@@ -452,7 +526,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 			const keyFilter = BdApi.Webpack.Filters.byKeys("Icon", "Title");
 
 			// patch the title bar to add the inbox button
-			const [ titlebarModule, titlebarKey ] =BdApi.Webpack.getWithKey((m) => keyFilter(m) && !stringFilter(m));
+			const [ titlebarModule, titlebarKey ] = BdApi.Webpack.getWithKey((m) => keyFilter(m) && !stringFilter(m));
 			Patcher.before(this.getName(), titlebarModule, titlebarKey, (that, [ props ]) => {
         if (props.toolbar.type === 'function') return;
         if (this.inboxPanel == null) { // build the panel if it's not already built
@@ -465,6 +539,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 			});
 
       this.userId = Modules.UserStore.getCurrentUser().id;
+
     }
 
     onStop() {
@@ -487,6 +562,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 			return res;
 		}
 
+		// fired when a message is received
     handleMessage(_, args) {
       try {
         const guilds = Object.values(Modules.GuildStore.getGuilds());
@@ -547,36 +623,41 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         }
 
         // run through every single keyword as a regex
-        this.settings.keywords.every((kw) => {
-          let rx;
-					let uid;
-					// first, filter out any user id matching
-					let isUserSpecific = /^@(\d+):(.*)$/g.exec(kw);
-					if (isUserSpecific != null) {
-						uid = isUserSpecific[1];
-						kw = isUserSpecific[2];
+        this.settings.keywords.every((keyword) => {
+          let regex = undefined; // the regex to run on the message content
+					let filter = undefined; 
+					// retrieve the filter (user, channel, server) if there is any
+					//                 type    id    regex
+					let isFiltered = /^([@#]?)(\d+):(.*)$/g.exec(keyword);
+					if (isFiltered != null) {
+						filter = {
+							type: isFiltered[1],
+							id: isFiltered[2],
+						};
+						keyword = isFiltered[3];
 					}
 					// then convert the rest into a regex
-          let isSlashRegex = /^\/(.*)\/([a-z]*)$/g.exec(kw);
+          let isSlashRegex = /^\/(.*)\/([a-z]*)$/g.exec(keyword);
           if (isSlashRegex != null) {
             let text = isSlashRegex[1];
             let flags = isSlashRegex[2];
-            rx = new RegExp(text, flags);
+            regex = new RegExp(text, flags);
           } else {
-            rx = new RegExp(RegexEscape(kw));
+            regex = new RegExp(RegexEscape(keyword));
           }
 
-					if (uid != null && !isNaN(uid) && message.author.id !== uid) {
+					// if there is a filter,,, and it doesn't pass, keep searching
+					if (filter != undefined && !this.passesFilter(filter, message)) {
 						return true;
 					}
 
-          if (rx.test(message.content) || (
+          if (regex.test(message.content) || (
 						message.embeds &&
 						this.settings.allowEmbeds &&
-						rx.test(JSON.stringify(this.objectValues(message.embeds)))
+						regex.test(JSON.stringify(this.objectValues(message.embeds)))
 					)) {
             let guild = guilds.find(g => g.id === channel.guild_id);
-            this.pingSuccess(message, channel, guild.name, rx);
+            this.pingSuccess(message, channel, guild.name, regex);
             return false; // stop searching
           }
           return true;
@@ -585,6 +666,20 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         Logger.error(`${e}`);
       }
     }
+
+		// type = @userid, #channelid, or serverid, message object, true if the message passes the filter and the content should be matched.
+		passesFilter({ type, id }, message) {
+			switch (type) {
+				case '@':
+					return message.author.id === id;
+				case '#':
+					return message.channel_id === id;
+				case '':
+					return message.guild_id === id;
+				default:
+					return false;
+			}
+		}
 
     sendMatchNotification(thumbnail, title, text, redirect, message) {
       Modules.NotificationModule.showNotification(
@@ -597,7 +692,9 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 				{
 					sound: this.settings.notifications ? 'message1' : null,
           onClick: () => {
-            delete this.settings.unreadMatches[message.id];
+						if (this.settings.markJumpedRead) {
+							delete this.settings.unreadMatches[message.id];
+						}
             this.saveSettings();
             Modules.NavigationUtils.transitionTo(
               redirect,
@@ -610,7 +707,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     }
 
     pingWhitelistMatch(message, channel, guild) {
-      Logger.info('Whitelist match found!');
+      log('Whitelist match found!');
       this.sendMatchNotification(
         `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.webp?size=256`,
         `User match in ${guild}!`,
@@ -624,7 +721,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     }
 
     pingSuccess(message, channel, guild, match) {
-      Logger.info('Match found!');
+      log('Match found!');
       this.sendMatchNotification(
         `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.webp?size=256`,
         `Keyword match in ${guild}!`,
@@ -632,9 +729,6 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         `/channels/${message.guild_id}/${channel.id}/${message.id}`,
         message,
       );
-      //if (this.settings.notifications) {
-        //Modules.SoundModule.playSound("message1", 0.4);
-      //}
       message._match = `${match}`;
       this.settings.unreadMatches[message.id] = message;
       this.saveSettings();
@@ -691,7 +785,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 
     // build the inbox panel placed directly after the pinned messages button
     buildInboxPanel() {
-      let pinned = document.querySelector('div[class*="toolbar" i] > div:first-child');
+      let pinned = document.querySelector('div[class^="toolbar" i] > div:first-child');
       if (!pinned) {
         return;
       }
@@ -699,10 +793,11 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
       const ModalCloseEvent = new Event('modalclose');
 
       let inbox = pinned.cloneNode(true);
+			inbox.querySelector('span')?.remove();
       inbox.setAttribute('is-keyword-tracker-inbox', true);
       inbox.setAttribute('aria-label', 'Keyword Matches');
       let icon = inbox.querySelector('svg');
-      icon.setAttribute('viewBox', '0 0 20 20');
+      icon.setAttribute('viewBox', '0 0 122 96');
       // icon!
       icon.innerHTML = iconSVG;
       inbox.appendChild(icon);
@@ -712,7 +807,11 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 
       // actual modal window on-click
       const openModal = () => {
-        let modalKey = Modals.showModal('Keyword Matches', this.renderInbox(() => { Modules.ModalActions.closeModal(modalKey); }), {
+				var modalKey = undefined;
+        const closeModal = () => {
+					Modules.ModalActions.closeModal(modalKey);
+        };
+        modalKey = Modals.showModal('Keyword Matches', this.renderInbox(closeModal), {
           confirmText: 'Close',
           cancelText: 'Mark as Read',
           onCancel: () => {
@@ -723,9 +822,6 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             this.saveSettings();
           }
         });
-        const closeModal = () => {
-          Modules.ModalActions.closeModal(modalKey);
-        };
         inbox.removeEventListener('modalclose', closeModal);
         inbox.addEventListener('modalclose', closeModal);
       };
@@ -754,49 +850,45 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
           });
 
         const matchEntry = (msg) => {
-          let entry = document.createElement('div');
+          const entry = document.createElement('div');
           entry.className = 'kt-inbox-entry';
+          entry.innerHTML = `
+            <div class="kt-entry-row">
+              <img class="kt-usericon" src="https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}.webp?size=24" />
+              <span class="kt-username"></span>
+              <span class="kt-timestamp">${new Date(msg.timestamp).toLocaleString()}</span>
+            </div>
+            <div class="kt-content"></div>
+            <div class="kt-entry-row">
+              <span class="kt-matched">Matched <code></code></span>
+              <span class="kt-spacer"></span>
+              <div class="kt-button kt-read">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path fill="currentColor" d="M21.7 5.3a1 1 0 0 1 0 1.4l-12 12a1 1 0 0 1-1.4 0l-6-6a1 1 0 1 1 1.4-1.4L9 16.58l11.3-11.3a1 1 0 0 1 1.4 0Z"></path></svg>
+              </div>
+              <div class="kt-button kt-jump">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path fill="currentColor" d="M15 2a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0V4.41l-4.3 4.3a1 1 0 1 1-1.4-1.42L19.58 3H16a1 1 0 0 1-1-1Z" class=""></path><path fill="currentColor" d="M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-6a1 1 0 1 0-2 0v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h6a1 1 0 1 0 0-2H5Z"></path></svg>
+              </div>
+            </div>
+          `;
 
-          let timestamp = document.createElement('span');
-          timestamp.className = 'timestamp';
-          timestamp.innerHTML = `${new Date(msg.timestamp).toLocaleString()}`;
-          entry.appendChild(timestamp);
+          entry.querySelector('.kt-username').textContent = msg.author.username;
+          entry.querySelector('.kt-content').textContent = msg.content;
+          entry.querySelector('.kt-matched > code').textContent = msg._match;
 
-          let icon = document.createElement('img');
-          let iconUrl = `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}.webp?size=256`
-          icon.className = 'usericon';
-          icon.setAttribute('src', iconUrl);
-          entry.appendChild(icon);
-
-          let username = document.createElement('span');
-          username.className = 'username';
-          username.innerHTML = `${msg.author.username}: `;
-          entry.appendChild(username);
-          
-          let content = document.createElement('span');
-          content.className = 'content';
-          content.innerHTML = msg.content;
-          entry.appendChild(content);
-
-          entry.appendChild(document.createElement('br'));
-
-          let matched = document.createElement('span');
-          matched.className = 'matched';
-          matched.innerHTML = `Matched ${msg._match}`;
-          entry.appendChild(matched);
-
-          let markRead = document.createElement('button');
-          markRead.addEventListener('click', () => {
+          let read_btn = entry.querySelector('.kt-read');
+					new Tooltip(read_btn, 'Mark as read');
+					read_btn.addEventListener('click', e => {
             delete this.settings.unreadMatches[msg.id];
             this.saveSettings();
             root.dispatchEvent(EntryFlushEvent);
           });
-          markRead.innerHTML = 'Mark as Read';
-          entry.appendChild(markRead);
 
-          let jump = document.createElement('button');
-          jump.addEventListener('click', () => {
-            delete this.settings.unreadMatches[msg.id];
+          let jump_btn = entry.querySelector('.kt-jump');
+					new Tooltip(jump_btn, 'Jump to message');
+					jump_btn.addEventListener('click', e => {
+						if (this.settings.markJumpedRead) {
+							delete this.settings.unreadMatches[msg.id];
+						}
             this.saveSettings();
             closeModal();
             Modules.NavigationUtils.transitionTo(
@@ -805,14 +897,12 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
               undefined,
             );
           });
-          jump.innerHTML = 'Jump';
-          entry.appendChild(jump);
 
           return entry;
         };
         if (sortedMatches.length === 0) {
-          root.innerHTML = 'No recent matches.';
-          root.setAttribute('style', 'line-height: 90px; text-align: center;');
+          root.textContent = 'No recent matches.';
+          root.setAttribute('style', 'line-height: 90px; text-align: center;  color: var(--text-normal);');
         } else {
           for(let msg of sortedMatches) {
             root.appendChild(matchEntry(msg));
@@ -822,7 +912,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
       setupEntries();
 
       root.addEventListener('entryflush', () => {
-        root.innerHTML = '';
+        root.textContent = '';
         setupEntries();
       });
 
@@ -848,8 +938,14 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
       let keywords = new SettingGroup('Keywords');
       panel.append(keywords);
 
-      let tip = new SettingField('', 'One keyword per line. Regex syntax allowed, eg. /sarah/i.\nPrefix your keyword with @userid: to track keyword matches from a single user, i.e. @135895345296048128:/word/i. A user\'s id can be found by right clicking their name -> Copy ID (Requires developer mode to be on.)', null, document.createElement('div'));
+      let tip = new SettingField('', 'One case-sensitive keyword per line. Regex syntax allowed, eg. /sarah/i. You can filter to specific users, channels, or servers. Examples:', null, document.createElement('div'));
       keywords.append(tip);
+      let tip2 = new SettingField('', '@12345678:Keyword watches for "Keyword" from user id 12345678 (Right click user -> Copy User ID, requires developer mode)', null, document.createElement('div'));
+      keywords.append(tip2);
+      let tip3 = new SettingField('', '#442312345:/case-insensitive/i watches messages in channel id 442312345 (Right click channel -> Copy Channel ID, requires developer mode)', null, document.createElement('div'));
+      keywords.append(tip3);
+      let tip4 = new SettingField('', '1239871234:/\d+/i watches numbers from server id 1239871234 (Right click server -> Copy Server ID, requires developer mode)', null, document.createElement('div'));
+      keywords.append(tip4);
       
       // add keyword textbox
       let textbox = document.createElement('textarea');
@@ -961,15 +1057,9 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 this.saveSettings();
               });
               let channelSwitchContainer = document.createElement('div');
-              channelSwitchContainer.style.width = '95%';
-              channelSwitchContainer.style['margin-left'] = '2.5%';
-              channelSwitchContainer.style.display = 'flex';
-              channelSwitchContainer.style['justify-content'] = 'space-between';
-              channelSwitchContainer.style['margin-bottom'] = '3px';
-              channelSwitchContainer.style['border-bottom'] = '1px solid #333';
+							channelSwitchContainer.className = 'kt-channel-container';
               let channelSwitchText = document.createElement('h2');
-              channelSwitchText.style['font-size'] = '16px';
-              channelSwitchText.style['color'] = 'white';
+							channelSwitchText.className = 'kt-channel-name';
               channelSwitchText.innerText = `${c.name}`;
               channelSwitchContainer.append(channelSwitchText);
               channelSwitchContainer.append(channelSwitch);
@@ -988,6 +1078,11 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
       //!! OTHER
       let other = new SettingGroup('Other');
       panel.append(other);
+
+      let markJumpedReadSwitch = this.makeSwitch(this.settings.markJumpedRead, (v) => {
+        this.settings.markJumpedRead = v;
+        this.saveSettings();
+      });
 
       let notificationSwitch = this.makeSwitch(this.settings.notifications, (v) => {
         this.settings.notifications = v;
@@ -1008,6 +1103,9 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         this.settings.allowEmbeds = v;
         this.saveSettings();
       });
+
+      let markJumpedReadToggle = new SettingField('', 'Mark messages as read when jumping to them.', null, markJumpedReadSwitch, { noteOnTop: true });
+      other.append(markJumpedReadToggle);
 
       let notificationToggle = new SettingField('', 'Enable notification sounds', null, notificationSwitch, { noteOnTop: true });
       other.append(notificationToggle);
