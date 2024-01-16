@@ -1,7 +1,7 @@
 /**
  * @name KeywordTracker
  * @description Be notified when a message matches a keyword :)
- * @version 1.5.2
+ * @version 1.5.3
  * @author sawahkitty!~<3
  * @authorId 135895345296048128
  * @authorLink https://github.com/sarahkittyy
@@ -42,7 +42,7 @@ const config = {
                 twitter_username: "snuggleskittyy"
             }
         ],
-        version: "1.5.2",
+        version: "1.5.3",
         description: "Be notified when a message matches a keyword :)",
         github: "https://github.com/sarahkittyy/KeywordTracker",
         github_raw: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js",
@@ -52,6 +52,12 @@ const config = {
         updateUrl: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"
     },
     changelog: [
+        {
+            title: "v1.5.3",
+            items: [
+                "Typo"
+            ]
+        },
         {
             title: "v1.5.2",
             items: [
@@ -902,11 +908,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         };
         if (sortedMatches.length === 0) {
           root.textContent = 'No recent matches.';
-<<<<<<< HEAD
           root.setAttribute('style', 'line-height: 90px; text-align: center;  color: var(--text-normal);');
-=======
-          root.setAttribute('style', 'line-height: 90px; text-align: center;');
->>>>>>> 44edde668dfd4f43026ff399cca5400c259666ab
         } else {
           for(let msg of sortedMatches) {
             root.appendChild(matchEntry(msg));
