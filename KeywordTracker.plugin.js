@@ -1,7 +1,7 @@
 /**
  * @name KeywordTracker
  * @description Be notified when a message matches a keyword :)
- * @version 1.5.4
+ * @version 1.5.5
  * @author sawahkitty!~<3
  * @authorId 135895345296048128
  * @authorLink https://github.com/sarahkittyy
@@ -42,7 +42,7 @@ const config = {
                 twitter_username: "snuggleskittyy"
             }
         ],
-        version: "1.5.4",
+        version: "1.5.5",
         description: "Be notified when a message matches a keyword :)",
         github: "https://github.com/sarahkittyy/KeywordTracker",
         github_raw: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js",
@@ -52,6 +52,12 @@ const config = {
         updateUrl: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"
     },
     changelog: [
+        {
+            title: "v1.5.5",
+            items: [
+                "Fix deprecated GuildStore."
+            ]
+        },
         {
             title: "v1.5.4",
             items: [
@@ -515,6 +521,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 	const NotificationModule = Webpack.getByKeys("showNotification");
 	const ModalActions = Webpack.getByKeys("openModal", "updateModal");
 	const ButtonData = Webpack.getByKeys("ButtonColors");
+	const GuildStore = Webpack.getStore("GuildStore");
 
 	const RegexEscape = function(string) {
 		return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -582,7 +589,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 		// fired when a message is received
 		handleMessage(_, args) {
 			try {
-				const guilds = Object.values(Modules.GuildStore.getGuilds());
+				const guilds = Object.values(GuildStore.getGuilds());
 				let event = args[0];
 				if (event.type !== 'MESSAGE_CREATE') return;
 				// get me  data
@@ -957,7 +964,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 		//TODO: god why
 		buildSettings() {
 			const { Textbox, SettingPanel, SettingGroup, Keybind, SettingField, /*Switch*/ } = Settings;
-			const guilds = Object.values(Modules.GuildStore.getGuilds())
+			const guilds = Object.values(GuildStore.getGuilds())
 											.sort((a, b) => `${a.id}`.localeCompare(`${b.id}`))
 											.map(g => {
 												g.channels = Modules.GuildChannelsStore.getChannels(g.id).SELECTABLE.map(c => c.channel);
