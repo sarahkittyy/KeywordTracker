@@ -516,10 +516,11 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 		DOM,
 		ReactUtils,
 		React,
+		UI,
 	} = BdApi;
 
+
 	const NotificationModule = Webpack.getByKeys("showNotification");
-	const ModalActions = Webpack.getByKeys("openModal", "updateModal");
 	const ButtonData = Webpack.getByKeys("ButtonColors");
 	const GuildStore = Webpack.getStore("GuildStore");
 
@@ -813,16 +814,17 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 		// from ui_modals.js in bd plugin lib, rewriting to fix since broken as of 4/2/2024
 		showModal(title, children, options = {}) {
 			const {danger = false, confirmText = "Okay", cancelText = "Cancel", onConfirm = () => {}, onCancel = () => {}} = options;
-			return ModalActions.openModal(props => {
-					return React.createElement(Modules.ConfirmationModal, Object.assign({
-							header: title,
-							confirmButtonColor: danger ? ButtonData.ButtonColors.RED : ButtonData.ButtonColors.BRAND,
-							confirmText: confirmText,
-							cancelText: cancelText,
-							onConfirm: onConfirm,
-							onCancel: onCancel
-					}, props), children);
-			});
+			return BdApi.UI.showConfirmationModal(
+				title,
+				children,
+				{
+					danger: danger,
+					confirmText: confirmText,
+					cancelText: cancelText,
+					onConfirm: onConfirm,
+					onCancel: onCancel
+				}
+			);
 		}
 
 		// build the inbox panel placed directly after the pinned messages button
@@ -851,7 +853,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 			const openModal = () => {
 				var modalKey = undefined;
 				const closeModal = () => {
-					Modules.ModalActions.closeModal(modalKey);
+					BdApi.UI.closeModal(modalKey);
 				};
 				modalKey = this.showModal('Keyword Matches', this.renderInbox(closeModal), {
 					confirmText: 'Close',
