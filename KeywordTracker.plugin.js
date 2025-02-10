@@ -853,7 +853,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 			const openModal = () => {
 				var modalKey = undefined;
 				const closeModal = () => {
-					BdApi.UI.closeModal(modalKey);
+					document.querySelector('.bd-modal-footer button').click();
 				};
 				modalKey = this.showModal('Keyword Matches', this.renderInbox(closeModal), {
 					confirmText: 'Close',
