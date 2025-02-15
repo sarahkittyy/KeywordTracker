@@ -1,7 +1,7 @@
 /**
  * @name KeywordTracker
  * @description Be notified when a message matches a keyword :)
- * @version 1.5.5
+ * @version 1.6.0
  * @author sawahkitty!~<3
  * @authorId 135895345296048128
  * @authorLink https://github.com/sarahkittyy
@@ -42,7 +42,7 @@ const config = {
                 twitter_username: "snuggleskittyy"
             }
         ],
-        version: "1.5.5",
+        version: "1.6.0",
         description: "Be notified when a message matches a keyword :)",
         github: "https://github.com/sarahkittyy/KeywordTracker",
         github_raw: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js",
@@ -52,6 +52,12 @@ const config = {
         updateUrl: "https://raw.githubusercontent.com/sarahkittyy/KeywordTracker/main/KeywordTracker.plugin.js"
     },
     changelog: [
+        {
+            title: "v1.6.0",
+            items: [
+                "Fix for new discord update"
+            ]
+        },
         {
             title: "v1.5.5",
             items: [
@@ -516,10 +522,10 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 		DOM,
 		ReactUtils,
 		React,
+		UI,
 	} = BdApi;
 
 	const NotificationModule = Webpack.getByKeys("showNotification");
-	const ModalActions = Webpack.getByKeys("openModal", "updateModal");
 	const ButtonData = Webpack.getByKeys("ButtonColors");
 	const GuildStore = Webpack.getStore("GuildStore");
 
@@ -618,6 +624,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 				if (this.settings.guilds[channel.guild_id] == null) {
 					let g = guilds.find(g => g.id === channel.guild_id);
 					if (!g) return;
+					console.log(g.channels);
 					this.settings.guilds[g.id] = {
 						// set all channels to enabled by default
 						channels: g.channels
@@ -813,16 +820,17 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 		// from ui_modals.js in bd plugin lib, rewriting to fix since broken as of 4/2/2024
 		showModal(title, children, options = {}) {
 			const {danger = false, confirmText = "Okay", cancelText = "Cancel", onConfirm = () => {}, onCancel = () => {}} = options;
-			return ModalActions.openModal(props => {
-					return React.createElement(Modules.ConfirmationModal, Object.assign({
-							header: title,
-							confirmButtonColor: danger ? ButtonData.ButtonColors.RED : ButtonData.ButtonColors.BRAND,
-							confirmText: confirmText,
-							cancelText: cancelText,
-							onConfirm: onConfirm,
-							onCancel: onCancel
-					}, props), children);
-			});
+			return UI.showConfirmationModal(
+				title,
+				children,
+				{
+					danger: danger,
+					confirmText: confirmText,
+					cancelText: cancelText,
+					onConfirm: onConfirm,
+					onCancel: onCancel
+				}
+			);
 		}
 
 		// build the inbox panel placed directly after the pinned messages button
@@ -851,7 +859,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 			const openModal = () => {
 				var modalKey = undefined;
 				const closeModal = () => {
-					Modules.ModalActions.closeModal(modalKey);
+					document.querySelector('.bd-modal-footer button').click();
 				};
 				modalKey = this.showModal('Keyword Matches', this.renderInbox(closeModal), {
 					confirmText: 'Close',
